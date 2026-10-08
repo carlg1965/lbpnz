@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record of Work Generator — SiteCheck NZ</title>
+<meta name="description" content="Create a Licensed Building Practitioner Record of Building Work (s.88 Building Act 2004) with your own logo, sign it on your phone and download a PDF.">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<script src="jspdf.umd.min.js"></script>
+<style>
+:root{--green:#1f4a2f;--stone:#ebebe6;--orange:#e07b00;--ink:#1d1d1b;--muted:#5b6159;--card:#fff;--line:#d4d4cc;--bg:#f6f6f2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--stone:#2a2d29;--ink:#ecece6;--muted:#a9ada6;--card:#1d201c;--line:#3a3e38;--bg:#141613}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Source Sans 3",system-ui,sans-serif}
+header{background:var(--green);color:#fff;padding:22px 16px}
+header div,main{max-width:760px;margin:0 auto}
+header a{color:#fff;opacity:.8;font-size:.85rem;text-decoration:none}
+h1{font:600 1.5rem "Source Serif 4",serif;margin:4px 0 0}
+header p{margin:4px 0 0;opacity:.85;font-size:.92rem}
+main{padding:16px 16px 90px}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 14px}
+h2{font:600 1.15rem "Source Serif 4",serif;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+label.f{display:block;margin:0 0 10px;font-weight:600;font-size:.92rem}
+label.f small{display:block;font-weight:400;color:var(--muted)}
+input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;margin-top:4px;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink)}
+textarea{min-height:60px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media(max-width:560px){.g2{grid-template-columns:1fr}}
+.work{border-top:1px solid var(--line);padding:12px 0}
+.work:first-of-type{border-top:0}
+.work b{display:block;margin-bottom:6px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.seg label{flex:1;min-width:110px}
+.seg input{position:absolute;opacity:0}
+.seg span{display:block;text-align:center;padding:9px 6px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:.92rem}
+.seg input:checked+span{background:var(--green);color:#fff;border-color:var(--green)}
+.seg input:focus-visible+span{outline:2px solid var(--orange)}
+.logo{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo img{max-height:70px;max-width:220px;border:1px solid var(--line);border-radius:6px;padding:4px;background:#fff}
+.btn{display:inline-block;background:var(--orange);color:#fff;border:0;font:600 1rem inherit;font-family:inherit;padding:11px 18px;border-radius:8px;cursor:pointer;text-decoration:none}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.small{padding:7px 12px;font-size:.88rem}
+canvas.sig{width:100%;height:150px;border:1px dashed var(--line);border-radius:8px;background:#fff;touch-action:none}
+.note{font-size:.85rem;color:var(--muted)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;justify-content:center}
+.err{background:#fbe9e7;color:#7a1a14;border-radius:8px;padding:10px;margin-top:10px}
+</style>
+</head>
+<body>
+<header><div>
+ <a href="/">← SiteCheck NZ</a>
+ <h1>Record of Building Work</h1>
+ <p>Memorandum from a Licensed Building Practitioner · section 88, Building Act 2004 · based on form LBP 12331</p>
+</div></header>
+<main id="app">
+ <section>
+  <h2>Your logo</h2>
+  <p class="sub">Optional. Appears at the top of your PDF. It is saved on this device for your next record.</p>
+  <div class="logo"><img id="logoImg" alt="Your logo" hidden>
+   <label class="btn ghost small">Upload logo<input type="file" accept="image/*" id="logoIn" hidden></label>
+   <button type="button" class="btn ghost small" id="logoRm" hidden>Remove</button></div>
+ </section>
+
+ <section>
+  <h2>Start from a checklist</h2>
+  <p class="sub">Copy the address, consent number and LBP details from a SiteCheck checklist you have filled in on this device.</p>
+  <select id="importSel"><option value="">Choose a checklist…</option></select>
+ </section>
+
+ <section>
+  <h2>1. The building</h2>
+  <label class="f">Street address<input type="text" data-k="b_street"></label>
+  <div class="g2"><label class="f">Suburb<input type="text" data-k="b_suburb"></label>
+  <label class="f">Town / city<input type="text" data-k="b_city"></label></div>
+  <label class="f">Postcode<input type="text" data-k="b_post" inputmode="numeric"></label>
+ </section>
+
+ <section>
+  <h2>2. The project</h2>
+  <p class="sub">Choose one.</p>
+  <div class="seg"><label><input type="radio" name="p_type" value="bc" data-k="p_type"><span>Building consent</span></label>
+  <label><input type="radio" name="p_type" value="pim" data-k="p_type"><span>PIM (exempt small standalone dwelling)</span></label></div>
+  <label class="f">Building consent or PIM number <span style="color:var(--orange)">*</span><input type="text" data-k="p_no"></label>
+ </section>
+
+ <section>
+  <h2>3. The owners</h2>
+  <label class="f">Name(s)<input type="text" data-k="o_name"></label>
+  <label class="f">Mailing address<input type="text" data-k="o_addr"></label>
+  <div class="g2"><label class="f">Suburb<input type="text" data-k="o_suburb"></label>
+  <label class="f">PO Box / Private Bag<input type="text" data-k="o_po"></label>
+  <label class="f">Town / city<input type="text" data-k="o_city"></label>
+  <label class="f">Postcode<input type="text" data-k="o_post"></label>
+  <label class="f">Phone<input type="tel" data-k="o_phone"></label>
+  <label class="f">Email<input type="email" data-k="o_email"></label></div>
+ </section>
+
+ <section>
+  <h2>4. Restricted building work — primary structure</h2>
+  <p class="sub">For each part you were involved in, say whether you carried out the work or supervised it, and describe it if needed. Leave the rest as "Not involved".</p>
+  <div id="ps"></div>
+ </section>
+
+ <section>
+  <h2>5. Restricted building work — external moisture management</h2>
+  <div id="em"></div>
+ </section>
+
+ <section>
+  <h2>6. Issued by</h2>
+  <div class="g2">
+  <label class="f">Name<input type="text" data-k="l_name"></label>
+  <label class="f">LBP or registration number<input type="text" data-k="l_no"></label>
+  <label class="f">Class(es) licensed in<small>For example Carpentry; Site 2</small><input type="text" data-k="l_class"></label>
+  <label class="f">PGDB registration number<small>If applicable</small><input type="text" data-k="l_pgdb"></label>
+  <label class="f">Company / trading name<small>Optional</small><input type="text" data-k="l_co"></label>
+  <label class="f">Street address / registered office<input type="text" data-k="l_street"></label>
+  <label class="f">Mailing address<small>If different</small><input type="text" data-k="l_mail"></label>
+  <label class="f">Suburb<input type="text" data-k="l_suburb"></label>
+  <label class="f">Town / city<input type="text" data-k="l_city"></label>
+  <label class="f">PO Box / Private Bag<input type="text" data-k="l_po"></label>
+  <label class="f">Postcode<input type="text" data-k="l_post"></label>
+  <label class="f">Phone<input type="tel" data-k="l_phone"></label>
+  <label class="f">Mobile<input type="tel" data-k="l_mobile"></label>
+  <label class="f">After hours<input type="tel" data-k="l_ah"></label>
+  <label class="f">Email<input type="email" data-k="l_email"></label>
+  <label class="f">Website<input type="text" data-k="l_web"></label>
+  </div>
+  <p class="note">Your own details (logo, name, licence and contact details) are remembered on this device for your next record.</p>
+ </section>
+
+ <section>
+  <h2>7. Declaration</h2>
+  <p>I, <b id="decName">[your name]</b>, carried out or supervised the restricted building work described in this record of building work.</p>
+  <label class="f">Signature</label>
+  <canvas class="sig" id="sig"></canvas>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="note">Sign with your finger or mouse</span><button type="button" class="btn ghost small" id="sigClr">Clear</button></div>
+  <label class="f" style="margin-top:10px">Date<input type="date" data-k="d_date"></label>
+  <div id="err"></div>
+ </section>
+ <p class="note">Give a copy to the owner and a copy to the building consent authority when your part of the restricted building work is complete. Check lbp.govt.nz for the current official form. This tool is independent and is not affiliated with MBIE or the LBP scheme.</p>
+</main>
+<div class="bar"><button class="btn ghost" id="newRec">New record</button><button class="btn" id="pdf">Download PDF</button></div>
+<script>
+const PS=[['ps_found','Foundations and subfloor framing'],['ps_walls','Walls'],['ps_roof','Roof'],['ps_cols','Columns and beams'],['ps_brace','Bracing'],['ps_other','Other']];
+const EM=[['em_damp','Damp proofing'],['em_roof','Roof cladding or roof cladding system'],['em_vent','Ventilation system (for example subfloor or cavity)'],['em_wall','Wall cladding or wall cladding system'],['em_wp','Waterproofing'],['em_other','Other']];
+const KEY='sc-row-v1', PROF='sc-row-profile-v1';
+const PROFILE_KEYS=['l_name','l_no','l_class','l_pgdb','l_co','l_street','l_mail','l_suburb','l_city','l_po','l_post','l_phone','l_mobile','l_ah','l_email','l_web'];
+const ls={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let st=ls.get(KEY)||{}; let prof=ls.get(PROF)||{};
+PROFILE_KEYS.forEach(k=>{if(!st[k]&&prof[k])st[k]=prof[k]});
+if(!st.d_date)st.d_date=new Date().toISOString().slice(0,10);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function workRows(list,el){document.getElementById(el).innerHTML=list.map(([k,l])=>`<div class="work"><b>${l}</b>
+ <div class="seg">${[['','Not involved'],['carried','Carried out'],['supervised','Supervised']].map(([v,t])=>`<label><input type="radio" name="${k}" value="${v}" data-k="${k}"><span>${t}</span></label>`).join('')}</div>
+ <textarea data-k="${k}_d" placeholder="Describe the work (if necessary)"></textarea></div>`).join('')}
+workRows(PS,'ps');workRows(EM,'em');
+function save(){ls.set(KEY,st);const p={};PROFILE_KEYS.forEach(k=>p[k]=st[k]||'');ls.set(PROF,p);document.getElementById('decName').textContent=st.l_name||'[your name]'}
+document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;
+ if(el.type==='radio'){el.checked=(st[k]||'')===el.value;el.addEventListener('change',()=>{st[k]=el.value;save()})}
+ else{el.value=st[k]||'';el.addEventListener('input',()=>{st[k]=el.value;save()})}});
+save();
+// logo
+const li=document.getElementById('logoImg'),lr=document.getElementById('logoRm');
+function showLogo(){const d=localStorage.getItem('sc-row-logo');li.hidden=!d;lr.hidden=!d;if(d)li.src=d}
+document.getElementById('logoIn').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);
+ img.onload=()=>{const s=Math.min(1,600/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*s;c.height=img.height*s;
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
+  try{localStorage.setItem('sc-row-logo',c.toDataURL('image/png'))}catch(err){alert('That logo is too large to save. Try a smaller image.')}showLogo();URL.revokeObjectURL(u)};img.src=u});
+lr.addEventListener('click',()=>{localStorage.removeItem('sc-row-logo');showLogo()});showLogo();
+// import from checklists
+const STAGES={prepour:'Prepour','floor-slab':'Floor slab',framing:'Framing',cladding:'Cavity and cladding',preline:'Preline',membrane:'Wet areas',drainage:'Drainage','pd-final':'Plumbing and drainage final','final-inspection':'Building final','retaining-wall':'Retaining wall'};
+const sel=document.getElementById('importSel');
+Object.entries(STAGES).forEach(([k,n])=>{const d=ls.get('sc-'+k+'-v1');if(d&&d.fields&&(d.fields.address||d.fields.bc))sel.insertAdjacentHTML('beforeend',`<option value="${k}">${esc(n)} — ${esc(d.fields.address||d.fields.bc)}</option>`)});
+if(sel.options.length===1)sel.closest('section').hidden=true;
+sel.addEventListener('change',()=>{const d=ls.get('sc-'+sel.value+'-v1');if(!d)return;const f=d.fields;
+ if(f.address)st.b_street=f.address;if(f.bc){st.p_no=f.bc;st.p_type='bc'}if(f.lbp)st.l_name=f.lbp;if(f.lbpno)st.l_no=f.lbpno;
+ if(sel.value==='framing'){st.ps_walls=st.ps_walls||'carried';st.ps_roof=st.ps_roof||'carried';st.ps_brace=st.ps_brace||'carried'}
+ save();location.reload()});
+// signature
+const cv=document.getElementById('sig'),cx=cv.getContext('2d');
+function sizeSig(){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;cx.setTransform(d,0,0,d,0,0);cx.lineWidth=2.4;cx.lineCap='round';cx.strokeStyle='#111';
+ if(st.sig){const im=new Image();im.onload=()=>cx.drawImage(im,0,0,r.width,r.height);im.src=st.sig}}
+sizeSig();let dr=false,lp=null;const pt=e=>{const b=cv.getBoundingClientRect();return{x:e.clientX-b.left,y:e.clientY-b.top}};
+cv.addEventListener('pointerdown',e=>{dr=true;lp=pt(e);cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(!dr)return;const p=pt(e);cx.beginPath();cx.moveTo(lp.x,lp.y);cx.lineTo(p.x,p.y);cx.stroke();lp=p});
+const end=()=>{if(!dr)return;dr=false;st.sig=cv.toDataURL('image/png');save()};cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+document.getElementById('sigClr').addEventListener('click',()=>{st.sig='';save();cx.clearRect(0,0,cv.width,cv.height)});
+document.getElementById('newRec').addEventListener('click',()=>{if(!confirm('Start a new record? Your logo and your own LBP details are kept; job details and signature are cleared.'))return;st={};localStorage.removeItem(KEY);location.reload()});
+// PDF
+document.getElementById('pdf').addEventListener('click',async()=>{
+ const miss=[];if(!(st.b_street||'').trim())miss.push('Building street address');if(!st.p_type)miss.push('Building consent or PIM (choose one)');if(!(st.p_no||'').trim())miss.push('Consent or PIM number');
+ if(!(st.l_name||'').trim())miss.push('Your name (Issued by)');if(!(st.l_no||'').trim())miss.push('LBP number');
+ if(![...PS,...EM].some(([k])=>st[k]))miss.push('At least one item of restricted building work');if(!st.sig)miss.push('Your signature');
+ const er=document.getElementById('err');if(miss.length){er.innerHTML='<div class="err"><b>Please add:</b><br>'+miss.map(esc).join('<br>')+'</div>';er.scrollIntoView({block:'center'});return}er.innerHTML='';
+ if(!window.jspdf){alert('The PDF tool did not load. Check your connection and try again.');return}
+ const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});const W=210,M=16,CW=W-2*M,B=280;let y=M;
+ const G=[31,74,47],MU=[91,97,89],LN=[200,200,192];
+ const need=h=>{if(y+h>B){doc.addPage();y=M}};
+ const txt=(s,o={})=>{const sz=o.size||10,lh=sz*.3528*1.35;doc.setFont('helvetica',o.bold?'bold':'normal');doc.setFontSize(sz);doc.setTextColor(...(o.color||[25,25,25]));
+  const x=o.x||M,lines=doc.splitTextToSize(String(s),o.w||(CW-(x-M)));lines.forEach(l=>{need(lh);doc.text(l,x,y+lh*.78);y+=lh});y+=o.gap??1.2};
+ const head=t=>{need(16);y+=3;doc.setFillColor(...G);doc.rect(M,y,CW,7,'F');doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(255,255,255);doc.text(t,M+2.5,y+4.9);y+=10};
+ const row=(l,v)=>{need(7);const yy=y;txt(l,{size:9,color:MU,w:52,gap:0});const y1=y;y=yy;txt(v||'—',{size:10,x:M+55,w:CW-55,gap:0});y=Math.max(y,y1)+1.6;doc.setDrawColor(...LN);doc.setLineWidth(.2);doc.line(M,y-.6,W-M,y-.6);y+=.8};
+ const logo=localStorage.getItem('sc-row-logo');
+ if(logo){const im=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=logo});const h=18,w=Math.min(60,h*im.width/im.height);doc.addImage(logo,'PNG',M,y,w,w*im.height/im.width>h?h:w*im.height/im.width)}
+ doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(...G);doc.text('Memorandum from Licensed Building Practitioner',W-M,y+6,{align:'right'});
+ doc.setFontSize(12);doc.text('Record of Building Work',W-M,y+12,{align:'right'});doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...MU);doc.text('Section 88, Building Act 2004',W-M,y+17,{align:'right'});y+=24;
+ head('1. The building');row('Street address',st.b_street);row('Suburb',st.b_suburb);row('Town / city',st.b_city);row('Postcode',st.b_post);
+ head('2. The project');row(st.p_type==='pim'?'PIM record number (non-consented small standalone dwelling)':'Building consent number',st.p_no);
+ head('3. The owners');row('Name(s)',st.o_name);row('Mailing address',[st.o_addr,st.o_suburb,st.o_po,st.o_city,st.o_post].filter(Boolean).join(', '));row('Phone',st.o_phone);row('Email',st.o_email);
+ const work=(t,list)=>{head(t);list.forEach(([k,l])=>{const v=st[k];row(l,v==='carried'?'Carried out the work'+(st[k+'_d']?' — '+st[k+'_d']:''):v==='supervised'?'Supervised the work'+(st[k+'_d']?' — '+st[k+'_d']:''):'Not involved')})};
+ work('4. Restricted building work: primary structure',PS);work('5. Restricted building work: external moisture management systems',EM);
+ head('6. Issued by');row('Name',st.l_name);if(st.l_co)row('Company / trading name',st.l_co);row('LBP or registration number',st.l_no);row('Class(es) licensed in',st.l_class);
+ if(st.l_pgdb)row('PGDB registration number',st.l_pgdb);row('Street address / registered office',[st.l_street,st.l_suburb,st.l_city,st.l_post].filter(Boolean).join(', '));
+ if(st.l_mail||st.l_po)row('Mailing address',[st.l_mail,st.l_po].filter(Boolean).join(', '));row('Phone / mobile / after hours',[st.l_phone,st.l_mobile,st.l_ah].filter(Boolean).join(' · '));row('Email',st.l_email);if(st.l_web)row('Website',st.l_web);
+ head('7. Declaration');txt('I, '+st.l_name+', carried out or supervised the restricted building work described in this record of building work.',{size:10.5,gap:3});
+ need(34);doc.addImage(st.sig,'PNG',M,y,70,25);doc.setDrawColor(...LN);doc.line(M,y+26,M+85,y+26);y+=29;
+ txt('Signature',{size:9,color:MU,gap:1});row('Date',st.d_date?new Date(st.d_date+'T00:00').toLocaleDateString('en-NZ',{day:'numeric',month:'long',year:'numeric'}):'');
+ y+=3;txt('Copies: building owner and building consent authority. Prepared with SiteCheck NZ (lbpnz.nz), based on form LBP 12331. Check www.lbp.govt.nz for the current official form.',{size:8,color:MU});
+ const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(...MU);doc.text('Record of Building Work · '+(st.b_street||''),M,289);doc.text('Page '+i+' of '+n,W-M,289,{align:'right'})}
+ const slug=(st.b_street||'site').toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40);doc.save('record-of-work-'+slug+'.pdf');
+});
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 const LOCK_FROM = Date.parse('2026-10-12T11:00:00Z'); // 12:00am Tue 13 Oct 2026, NZDT
 const FREE = new Set(['framing']);
 const PAID = new Set(['prepour', 'floor-slab', 'cladding', 'preline', 'membrane', 'drainage',
-  'pd-final', 'final-inspection', 'retaining-wall']);
+  'pd-final', 'final-inspection', 'retaining-wall', 'record-of-work']);
 
 function locked(env) {
   const mode = (env.LOCK || 'auto').toLowerCase();

@@ -39,8 +39,8 @@ a.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 </main>
 <script>
 const s=new URLSearchParams(location.search).get('stage');
-const N={prepour:'Prepour','floor-slab':'Floor slab',cladding:'Cavity and cladding',preline:'Preline',membrane:'Wet areas',drainage:'Drainage','pd-final':'Plumbing and drainage final','final-inspection':'Building final','retaining-wall':'Retaining wall'};
-if(N[s])document.getElementById('t').textContent='The '+N[s]+' checklist is part of full access';
+const N={'record-of-work':'Record of Work generator',prepour:'Prepour','floor-slab':'Floor slab',cladding:'Cavity and cladding',preline:'Preline',membrane:'Wet areas',drainage:'Drainage','pd-final':'Plumbing and drainage final','final-inspection':'Building final','retaining-wall':'Retaining wall'};
+if(N[s])document.getElementById('t').textContent='The '+N[s]+(s==='record-of-work'?' is':' checklist is')+' part of full access';
 </script>
 </body>
 </html>
