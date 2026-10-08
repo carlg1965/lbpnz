@@ -25,14 +25,31 @@ a.btn{display:inline-block;background:var(--orange);color:#fff;font-weight:600;t
 .list{display:grid;gap:10px}.row{display:block;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:10px;padding:12px 14px;color:var(--ink);text-decoration:none}.row b{display:block;font-weight:600}.row span{font-size:.9rem;opacity:.75}.row:hover{border-color:var(--orange)}
 .free{background:var(--green);color:#fff;font-size:.7rem;padding:2px 7px;border-radius:4px;margin-left:6px}
 .lock{font-size:.75rem;margin-left:6px;opacity:.8}
+.hnav{max-width:760px;margin:14px auto 0;display:flex;gap:10px;flex-wrap:wrap}
+.hbtn{display:inline-block;background:var(--orange);color:#fff;font-weight:600;text-decoration:none;padding:9px 16px;border-radius:999px}
+.ghostb{background:transparent;border:1px solid rgba(255,255,255,.7)}
+.price-card{display:block;background:var(--card);border:2px solid var(--orange);border-radius:12px;padding:16px;margin:4px 0 18px;color:var(--ink);text-decoration:none}
+.price-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pc-tag{display:inline-block;background:var(--green);color:#fff;font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:6px;margin-bottom:10px}
+.pc-row{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:1.05rem}
+.pc-row b{font-weight:600}
+.pc-sub{display:block;font-size:.9rem;opacity:.75;margin-top:8px}
+.pc-cta{display:inline-block;margin-top:12px;font-weight:600;color:var(--orange)}
 </style>
 </head>
 <body>
 <header>
  <h1>SiteCheck NZ</h1>
- <p>Free field checklists for building inspections under the Building Act 2004 and NZ Building Code.</p>
+ <p>Inspection checklists for LBPs and building students under the Building Act 2004 and NZ Building Code.</p>
+ <nav class="hnav"><a href="/access.html" class="hbtn">Pricing</a><a href="/framing.html" class="hbtn ghostb">Try Framing free</a></nav>
 </header>
 <main>
+ <a class="price-card" href="/access.html">
+  <span class="pc-tag" id="pcTag">Free for everyone until 11:59pm Monday 12 October</span>
+  <span class="pc-row"><span><b>LBP Pro</b> $149 / yr</span><span><b>Student</b> $39 / yr</span><span><b>Company</b> $1,490 / yr</span></span>
+  <span class="pc-sub">All checklists, PDF records and the Record of Work generator. One payment covers 12 months. Framing is always free.</span>
+  <span class="pc-cta">See plans and buy →</span>
+ </a>
  <h2>Checklists</h2>
  <p>Practitioner-level checklists for each BCA inspection, in build order. Each one cites the Building Code clause or Standard, flags common fail points, takes photos and signatures, and produces a PDF inspection record.</p>
  <div class="list">
@@ -56,6 +73,7 @@ a.btn{display:inline-block;background:var(--orange);color:#fff;font-weight:600;t
 </main>
 <script>
 fetch('/api/status',{cache:'no-store'}).then(r=>r.json()).then(st=>{
+ const tg=document.getElementById('pcTag');if(st.pass){tg.textContent='You have full access';}else if(st.locked){tg.textContent='Full access required for most checklists';}
  if(!st.locked||st.pass)return;
  document.querySelectorAll('.row').forEach(a=>{const k=a.getAttribute('href').replace(/^\/|\.html$/g,'');
   if(!st.free.includes(k)){const b=a.querySelector('b');b.insertAdjacentHTML('beforeend',' <span class="lock">🔒 Full access</span>');}});
