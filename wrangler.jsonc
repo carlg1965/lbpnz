@@ -1,6 +1,10 @@
 {
   "name": "lbpnz",
   "compatibility_date": "2026-10-01",
-  // Static site: serve every file in this folder as-is.
-  "assets": { "directory": "./" }
+  "main": "src/worker.js",
+  // Keep variables set in the Cloudflare dashboard on every deploy.
+  "keep_vars": true,
+  // "auto" locks paid checklists from 12:00am Tue 13 Oct 2026 NZ time. "off" opens all, "on" locks now.
+  "vars": { "LOCK": "auto" },
+  "assets": { "directory": "./", "binding": "ASSETS", "run_worker_first": true }
 }

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full access coming soon — SiteCheck NZ</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1f4a2f;--stone:#ebebe6;--orange:#e07b00;--ink:#1d1d1b;--card:#fff;--line:#d4d4cc;--bg:#f6f6f2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--stone:#2a2d29;--ink:#ecece6;--card:#1d201c;--line:#3a3e38;--bg:#141613}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Source Sans 3",system-ui,sans-serif}
+header{background:var(--green);color:#fff;padding:28px 16px}
+header div,main{max-width:760px;margin:0 auto}
+header a{color:#fff;opacity:.8;font-size:.9rem;text-decoration:none}
+h1{font:600 1.7rem "Source Serif 4",serif;margin:6px 0 0}
+main{padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:0 0 14px}
+h2{font:600 1.15rem "Source Serif 4",serif;margin:0 0 8px}
+ul{margin:8px 0 0;padding-left:20px}
+a.btn{display:inline-block;background:var(--orange);color:#fff;font-weight:600;text-decoration:none;padding:11px 18px;border-radius:8px;margin:6px 8px 0 0}
+a.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header><div><a href="/">← SiteCheck NZ</a><h1 id="t">This checklist is part of full access</h1></div></header>
+<main>
+ <div class="card">
+  <h2>Paid access is on its way</h2>
+  <p>The free trial period has ended. The full set of SiteCheck NZ inspection checklists will soon be available by subscription, including:</p>
+  <ul>
+   <li>All nine inspection stages plus retaining walls, with photo records and PDF reports</li>
+   <li>A Record of Work (s.88) generator with your own company logo</li>
+   <li>White-label versions for construction companies</li>
+  </ul>
+  <a class="btn" href="/framing.html">Try the free Framing checklist</a>
+  <a class="btn ghost" href="mailto:contact@lbpnz.nz?subject=SiteCheck%20NZ%20access">Ask about early or company access</a>
+ </div>
+</main>
+<script>
+const s=new URLSearchParams(location.search).get('stage');
+const N={prepour:'Prepour','floor-slab':'Floor slab',cladding:'Cavity and cladding',preline:'Preline',membrane:'Wet areas',drainage:'Drainage','pd-final':'Plumbing and drainage final','final-inspection':'Building final','retaining-wall':'Retaining wall'};
+if(N[s])document.getElementById('t').textContent='The '+N[s]+' checklist is part of full access';
+</script>
+</body>
+</html>
