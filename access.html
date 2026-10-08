@@ -20,27 +20,56 @@ h2{font:600 1.15rem "Source Serif 4",serif;margin:0 0 8px}
 ul{margin:8px 0 0;padding-left:20px}
 a.btn{display:inline-block;background:var(--orange);color:#fff;font-weight:600;text-decoration:none;padding:11px 18px;border-radius:8px;margin:6px 8px 0 0}
 a.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.plans{display:grid;gap:14px}@media(min-width:760px){.plans{grid-template-columns:1fr 1fr 1fr}main{max-width:1000px}}
+.price{font:600 1.6rem "Source Serif 4",serif;margin:4px 0}.price small{display:block;font:400 .8rem "Source Sans 3",sans-serif;opacity:.7}
+.plan{display:flex;flex-direction:column}.plan ul{flex:1}
 </style>
 </head>
 <body>
-<header><div><a href="/">← SiteCheck NZ</a><h1 id="t">This checklist is part of full access</h1></div></header>
+<header><div><a href="/">← SiteCheck NZ</a><h1 id="t">SiteCheck NZ full access</h1></div></header>
 <main>
- <div class="card">
-  <h2>Paid access is on its way</h2>
-  <p>The free trial period has ended. The full set of SiteCheck NZ inspection checklists will soon be available by subscription, including:</p>
-  <ul>
-   <li>All nine inspection stages plus retaining walls, with photo records and PDF reports</li>
-   <li>A Record of Work (s.88) generator with your own company logo</li>
-   <li>White-label versions for construction companies</li>
-  </ul>
-  <a class="btn" href="/framing.html">Try the free Framing checklist</a>
-  <a class="btn ghost" href="mailto:contact@lbpnz.nz?subject=SiteCheck%20NZ%20access">Ask about early or company access</a>
+ <div class="card" id="paid" hidden>
+  <h2>Payment received — you're in</h2>
+  <p>Your full access is active on this device for 12 months. To use it on your phone or another computer, open this personal link there. Keep it somewhere safe (email it to yourself) — it's your proof of purchase.</p>
+  <p><input id="keylink" readonly style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink)"></p>
+  <a class="btn" id="copy" href="#">Copy link</a><a class="btn ghost" href="/">Go to the checklists</a>
  </div>
+ <div class="card" id="intro">
+  <h2>Full access</h2>
+  <p>All nine inspection checklists plus retaining walls, with photo records and PDF reports, and the Record of Work (s.88) generator with your own logo. One payment covers 12 months. No subscription to cancel.</p>
+ </div>
+ <div class="plans">
+  <div class="card plan">
+   <h2>LBP Pro</h2><p class="price">$149 <small>NZD incl GST · 12 months</small></p>
+   <ul><li>All 10 checklists</li><li>Photos, signatures and PDF records</li><li>Record of Work generator with your logo</li><li>Use on all your devices</li></ul>
+   <a class="btn buy" href="/api/checkout?plan=pro">Buy LBP Pro</a>
+  </div>
+  <div class="card plan">
+   <h2>Student</h2><p class="price">$39 <small>NZD incl GST · 12 months</small></p>
+   <ul><li>Everything in LBP Pro</li><li>For enrolled building students</li></ul>
+   <form action="/api/checkout" method="get"><input type="hidden" name="plan" value="student">
+    <label style="display:block;font-weight:600;margin:8px 0 4px">Student code from your tutor</label>
+    <input name="code" required autocomplete="off" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink)">
+    <p id="codeerr" style="color:#b3261e;margin:6px 0 0" hidden>That code wasn't recognised. Check with your tutor.</p>
+    <button class="btn buy" style="border:0;font:600 1rem inherit;font-family:inherit;cursor:pointer;margin-top:10px">Buy Student</button></form>
+  </div>
+  <div class="card plan">
+   <h2>Company</h2><p class="price">$1,490 <small>NZD incl GST · 12 months · up to 10 users</small></p>
+   <ul><li>Your company logo and colours on every checklist and PDF</li><li>Your own SiteCheck link for your team</li><li>Company Record of Work template</li><li>$99 per extra user</li></ul>
+   <a class="btn ghost" href="mailto:contact@lbpnz.nz?subject=SiteCheck%20NZ%20company%20licence">Talk to us</a>
+  </div>
+ </div>
+ <p style="font-size:.85rem;opacity:.75">Secure payment by Stripe. You'll receive a tax invoice by email. <a href="/framing.html" style="color:inherit">Try the free Framing checklist first.</a></p>
 </main>
 <script>
-const s=new URLSearchParams(location.search).get('stage');
+const q=new URLSearchParams(location.search),s=q.get('stage');
 const N={'record-of-work':'Record of Work generator',prepour:'Prepour','floor-slab':'Floor slab',cladding:'Cavity and cladding',preline:'Preline',membrane:'Wet areas',drainage:'Drainage','pd-final':'Plumbing and drainage final','final-inspection':'Building final','retaining-wall':'Retaining wall'};
 if(N[s])document.getElementById('t').textContent='The '+N[s]+(s==='record-of-work'?' is':' checklist is')+' part of full access';
+if(q.get('err')==='code')document.getElementById('codeerr').hidden=false;
+if(q.get('key')){const l=location.origin+'/api/unlock?key='+encodeURIComponent(q.get('key'));document.getElementById('keylink').value=l;document.getElementById('paid').hidden=false;document.getElementById('intro').hidden=true;
+ document.getElementById('t').textContent='Thank you';document.querySelector('.plans').hidden=true;
+ document.getElementById('copy').onclick=e=>{e.preventDefault();navigator.clipboard&&navigator.clipboard.writeText(l);e.target.textContent='Copied'}}
+fetch('/api/status',{cache:'no-store'}).then(r=>r.json()).then(st=>{if(!st.payments)document.querySelectorAll('.buy').forEach(b=>{b.textContent='Available soon';b.style.pointerEvents='none';b.style.opacity=.5})}).catch(()=>{});
 </script>
 </body>
 </html>
