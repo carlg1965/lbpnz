@@ -45,6 +45,8 @@ canvas.sig{width:100%;height:150px;border:1px dashed var(--line);border-radius:8
 .note{font-size:.85rem;color:var(--muted)}
 .bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;justify-content:center}
 .err{background:#fbe9e7;color:#7a1a14;border-radius:8px;padding:10px;margin-top:10px}
+.decName{display:inline-block;width:auto;min-width:12ch;max-width:100%;font:inherit;font-weight:600;padding:2px 6px;margin:0 2px;border:0;border-bottom:2px dashed var(--orange,#e07b00);border-radius:0;background:transparent;color:inherit}
+.decName:focus{outline:none;border-bottom-style:solid}
 </style>
 </head>
 <body>
@@ -132,7 +134,7 @@ canvas.sig{width:100%;height:150px;border:1px dashed var(--line);border-radius:8
 
  <section>
   <h2>7. Declaration</h2>
-  <p>I, <b id="decName">[your name]</b>, carried out or supervised the restricted building work described in this record of building work.</p>
+  <p>I, <input type="text" class="decName" data-k="l_name" placeholder="your name" aria-label="Your name">, carried out or supervised the restricted building work described in this record of building work.</p>
   <label class="f">Signature</label>
   <canvas class="sig" id="sig"></canvas>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="note">Sign with your finger or mouse</span><button type="button" class="btn ghost small" id="sigClr">Clear</button></div>
@@ -156,7 +158,7 @@ function workRows(list,el){document.getElementById(el).innerHTML=list.map(([k,l]
  <div class="seg">${[['','Not involved'],['carried','Carried out'],['supervised','Supervised']].map(([v,t])=>`<label><input type="radio" name="${k}" value="${v}" data-k="${k}"><span>${t}</span></label>`).join('')}</div>
  <textarea data-k="${k}_d" placeholder="Describe the work (if necessary)"></textarea></div>`).join('')}
 workRows(PS,'ps');workRows(EM,'em');
-function save(){ls.set(KEY,st);const p={};PROFILE_KEYS.forEach(k=>p[k]=st[k]||'');ls.set(PROF,p);document.getElementById('decName').textContent=st.l_name||'[your name]'}
+function save(){ls.set(KEY,st);const p={};PROFILE_KEYS.forEach(k=>p[k]=st[k]||'');ls.set(PROF,p);document.querySelectorAll('[data-k="l_name"]').forEach(e=>{if(e!==document.activeElement)e.value=st.l_name||''})}
 document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;
  if(el.type==='radio'){el.checked=(st[k]||'')===el.value;el.addEventListener('change',()=>{st[k]=el.value;save()})}
  else{el.value=st[k]||'';el.addEventListener('input',()=>{st[k]=el.value;save()})}});
